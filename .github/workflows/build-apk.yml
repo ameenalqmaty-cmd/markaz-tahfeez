@@ -9,12 +9,12 @@ on:
       versionCode:
         description: "رقم الإصدار: 1 ثم 2 ثم 3 ... (يجب أن يزيد في كل بناء جديد)"
         required: true
-        default: "1"
+        default: "4"
         type: string
       versionName:
         description: "اسم الإصدار (مثل 1.0.0)"
         required: true
-        default: "1.0.0"
+        default: "1.8.6"
         type: string
 
 jobs:
@@ -168,6 +168,33 @@ jobs:
       - name: Patch Android project
         run: node scripts/prepare.js android
 
+      - name: Generate custom reminder sound
+        run: |
+          mkdir -p android/app/src/main/res/raw
+          python3 - <<'SND_EOF'
+          import math, struct, wave
+          sr = 24000
+          notes = [(587.33, 0.00, 0.9), (880.00, 0.15, 0.9), (739.99, 0.30, 0.9), (1174.66, 0.50, 1.3)]
+          parts = [(1.0, 1.0, 5.5), (2.0, 0.38, 7.0), (3.01, 0.16, 10.0), (4.2, 0.07, 14.0)]
+          out = [0.0] * int(sr * 2.0)
+          for f, st, d in notes:
+              amp = 1.0 if f < 1000 else 0.85
+              n = int(sr * (d + 0.4)); i0 = int(st * sr)
+              for k in range(n):
+                  if i0 + k >= len(out): break
+                  t = k / sr
+                  v = sum(a * math.sin(2 * math.pi * f * m * t) * math.exp(-dec * t) for m, a, dec in parts)
+                  out[i0 + k] += v * min(1.0, t / 0.006) * amp
+          pk = max(abs(x) for x in out) or 1.0
+          out = [x / pk * 0.85 for x in out]
+          fade = int(0.08 * sr)
+          for k in range(fade): out[-fade + k] *= 1 - k / fade
+          w = wave.open('android/app/src/main/res/raw/markaz_chime.wav', 'wb')
+          w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
+          w.writeframes(b''.join(struct.pack('<h', int(x * 32767)) for x in out)); w.close()
+          SND_EOF
+          ls -la android/app/src/main/res/raw
+
       - name: Generate icons
         continue-on-error: true
         run: |
@@ -198,5 +225,4 @@ jobs:
           name: markaz-tahfeez-apk
           path: markaz-tahfeez.apk
 
-
-        
+          
