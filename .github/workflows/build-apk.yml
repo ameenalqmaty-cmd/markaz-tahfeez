@@ -80,6 +80,48 @@ jobs:
             }
             fs.mkdirSync('android/app/src/main/res/values-night', { recursive: true });
             fs.writeFileSync('android/app/src/main/res/values-night/styles.xml', '<?xml version="1.0" encoding="utf-8"?><resources><style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar"><item name="windowActionBar">false</item><item name="windowNoTitle">true</item><item name="android:background">@null</item><item name="android:navigationBarColor">#0e1512</item></style></resources>');
+            const lst = 'android/app/src/main/res/values/styles.xml';
+            if (fs.existsSync(lst)) {
+              let u = fs.readFileSync(lst, 'utf8');
+              u = u.replace(/@drawable\/splash/g, '@color/hifz_splash');
+              const hasSS = u.includes('Theme.SplashScreen');
+              u = u.replace(/(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)/, '$1\n        <item name="android:navigationBarColor">#11503f</item>' + (hasSS ? '\n        <item name="windowSplashScreenBackground">@color/hifz_splash</item>' : ''));
+              fs.writeFileSync(lst, u);
+            }
+            fs.writeFileSync('android/app/src/main/res/values/hifz_colors.xml', '<?xml version="1.0" encoding="utf-8"?><resources><color name="hifz_splash">#11503f</color></resources>');
+            const mdir = 'android/app/src/main/java/ly/markaz/tahfeez';
+            if (fs.existsSync(mdir)) {
+              fs.writeFileSync(mdir + '/MainActivity.java', [
+                'package ly.markaz.tahfeez;',
+                'import android.graphics.Color;',
+                'import android.os.Bundle;',
+                'import android.view.View;',
+                'import com.getcapacitor.BridgeActivity;',
+                'public class MainActivity extends BridgeActivity {',
+                '  private void applyNav(String hex, boolean light) {',
+                '    try {',
+                '      getWindow().setNavigationBarColor(Color.parseColor(hex));',
+                '      View d = getWindow().getDecorView();',
+                '      int f = d.getSystemUiVisibility();',
+                '      d.setSystemUiVisibility(light ? (f | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) : (f & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));',
+                '    } catch (Exception e) {}',
+                '  }',
+                '  @Override',
+                '  public void onCreate(Bundle savedInstanceState) {',
+                '    super.onCreate(savedInstanceState);',
+                '    applyNav("#f6f3ec", true);',
+                '    try {',
+                '      getBridge().getWebView().addJavascriptInterface(new Object() {',
+                '        @android.webkit.JavascriptInterface',
+                '        public void setNav(final String hex, final boolean light) {',
+                '          runOnUiThread(new Runnable() { public void run() { applyNav(hex, light); } });',
+                '        }',
+                '      }, "HifzNative");',
+                '    } catch (Exception e) {}',
+                '  }',
+                '}'
+              ].join('\n'));
+            }
           }
           JS_EOF
           cat > make_icons.py <<'PY_EOF'
@@ -108,6 +150,8 @@ jobs:
           full = Image.new('RGBA', (S, S), bg); full.alpha_composite(glyph(S, 60)); full.save('assets/icon-only.png')
           Image.new('RGBA', (S, S), bg).save('assets/icon-background.png')
           glyph(S, 200).save('assets/icon-foreground.png')
+          os.makedirs('android/app/src/main/res/drawable', exist_ok=True)
+          full.resize((192, 192), Image.LANCZOS).save('android/app/src/main/res/drawable/ic_large_notify.png')
           PY_EOF
           echo "$KS_B64" | base64 -d > release.keystore
 
