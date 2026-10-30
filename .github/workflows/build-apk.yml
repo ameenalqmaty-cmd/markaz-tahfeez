@@ -9,12 +9,12 @@ on:
       versionCode:
         description: "رقم الإصدار: 1 ثم 2 ثم 3 ... (يجب أن يزيد في كل بناء جديد)"
         required: true
-        default: "4"
+        default: "5"
         type: string
       versionName:
         description: "اسم الإصدار (مثل 1.0.0)"
         required: true
-        default: "1.8.6"
+        default: "1.8.7"
         type: string
 
 jobs:
@@ -168,61 +168,56 @@ jobs:
       - name: Patch Android project
         run: node scripts/prepare.js android
 
-      - name: Generate custom reminder sound
-        run: |
-          mkdir -p android/app/src/main/res/raw
-          python3 - <<'SND_EOF'
-          import math, struct, wave
-          sr = 24000
-          notes = [(587.33, 0.00, 0.9), (880.00, 0.15, 0.9), (739.99, 0.30, 0.9), (1174.66, 0.50, 1.3)]
-          parts = [(1.0, 1.0, 5.5), (2.0, 0.38, 7.0), (3.01, 0.16, 10.0), (4.2, 0.07, 14.0)]
-          out = [0.0] * int(sr * 2.0)
-          for f, st, d in notes:
-              amp = 1.0 if f < 1000 else 0.85
-              n = int(sr * (d + 0.4)); i0 = int(st * sr)
-              for k in range(n):
-                  if i0 + k >= len(out): break
-                  t = k / sr
-                  v = sum(a * math.sin(2 * math.pi * f * m * t) * math.exp(-dec * t) for m, a, dec in parts)
-                  out[i0 + k] += v * min(1.0, t / 0.006) * amp
-          pk = max(abs(x) for x in out) or 1.0
-          out = [x / pk * 0.85 for x in out]
-          fade = int(0.08 * sr)
-          for k in range(fade): out[-fade + k] *= 1 - k / fade
-          w = wave.open('android/app/src/main/res/raw/markaz_chime.wav', 'wb')
-          w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
-          w.writeframes(b''.join(struct.pack('<h', int(x * 32767)) for x in out)); w.close()
-          SND_EOF
-          ls -la android/app/src/main/res/raw
-
-      - name: Generate icons
-        continue-on-error: true
+      - name: Native edge-to-edge and logo splash
         run: |
           pip install pillow
-          python3 make_icons.py
-          npx capacitor-assets generate --android --iconBackgroundColor '#0f3d3e' --iconBackgroundColorDark '#0f3d3e'
-
-      - name: Sync
-        run: npx cap sync android
-
-      - name: Build release APK
-        working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
-
-      - name: Align and sign
-        run: |
-          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
-          APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
-          echo "Unsigned: $APK"
-          $BT/zipalign -p -f 4 "$APK" aligned.apk
-          $BT/apksigner sign --ks release.keystore --ks-pass pass:$KS_PASS --key-pass pass:$KS_PASS --ks-key-alias $KS_ALIAS --out markaz-tahfeez.apk aligned.apk
-          $BT/apksigner verify --print-certs markaz-tahfeez.apk | head -3
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: markaz-tahfeez-apk
-          path: markaz-tahfeez.apk
-
-          
+          R=android/app/src/main/res
+          mkdir -p $R/drawable-nodpi $R/drawable-v23 $R/drawable
+          python3 - <<'LOGO_EOF'
+          import os, urllib.request
+          from PIL import Image, ImageDraw, ImageChops
+          R = 'android/app/src/main/res'
+          site = os.environ['SITE_URL'].strip().rstrip('/')
+          try:
+              req = urllib.request.Request(site + '/icon-512.png', headers={'User-Agent': 'Mozilla/5.0'})
+              open('logo_src.png', 'wb').write(urllib.request.urlopen(req, timeout=30).read())
+              src = Image.open('logo_src.png').convert('RGBA')
+          except Exception as e:
+              print('icon download failed, using plain fallback:', e)
+              src = Image.new('RGBA', (512, 512), (17, 80, 63, 255))
+          L = 448
+          logo = src.resize((L, L), Image.LANCZOS)
+          mask = Image.new('L', (L, L), 0)
+          ImageDraw.Draw(mask).rounded_rectangle([0, 0, L - 1, L - 1], radius=int(L * 30 / 112), fill=255)
+          logo.putalpha(ImageChops.multiply(logo.getchannel('A'), mask))
+          logo.save(R + '/drawable-nodpi/hifz_logo.png')
+          C = 1152
+          canvas = Image.new('RGBA', (C, C), (0, 0, 0, 0))
+          canvas.paste(logo, ((C - L) // 2, (C - L) // 2), logo)
+          canvas.save(R + '/drawable-nodpi/hifz_splash_icon.png')
+          LOGO_EOF
+          cat > $R/drawable/hifz_window_bg.xml <<'XML_EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+              <item><shape android:shape="rectangle"><solid android:color="#11503f" /></shape></item>
+          </layer-list>
+          XML_EOF
+          cat > $R/drawable-v23/hifz_window_bg.xml <<'XML_EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+              <item><shape android:shape="rectangle"><solid android:color="#11503f" /></shape></item>
+              <item android:width="112dp" android:height="112dp" android:gravity="center">
+                  <bitmap android:src="@drawable/hifz_logo" android:gravity="fill" />
+              </item>
+          </layer-list>
+          XML_EOF
+          python3 - <<'STY_EOF'
+          import os, re
+          R = 'android/app/src/main/res'
+          for f in ['values/styles.xml', 'values-night/styles.xml']:
+              p = os.path.join(R, f)
+              if not os.path.exists(p): continue
+              t = open(p, encoding='utf-8').read()
+              t = t.replace('<item name="android:windowBackground">@color/hifz_splash</item>', '<item name="android:windowBackground">@drawable/hifz_window_bg</item>')
+              if 'Theme.SplashScreen' in t and 'windowSplashScreenAnimatedIcon' not in t:
+                  t = re.sub(r'(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)', r'\1\n        <item 
