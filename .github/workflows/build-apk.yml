@@ -9,7 +9,7 @@ on:
       versionCode:
         description: "رقم الإصدار: 1 ثم 2 ثم 3 ... (يجب أن يزيد في كل بناء جديد)"
         required: true
-        default: "5"
+        default: "8"
         type: string
       versionName:
         description: "اسم الإصدار (مثل 1.0.0)"
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       SITE_URL: ${{ inputs.siteUrl }}
       VERSION_CODE: ${{ inputs.versionCode }}
@@ -30,6 +30,13 @@ jobs:
       KS_ALIAS: markaz
       KS_B64: "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"
     steps:
+      - name: Normalize site URL
+        run: |
+          U="$(echo "$SITE_URL" | xargs)"
+          U="${U%/}"
+          case "$U" in http://*|https://*) ;; *) U="https://$U" ;; esac
+          echo "SITE_URL=$U" >> "$GITHUB_ENV"
+          echo "Site URL: $U"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -41,125 +48,102 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Create project files
+      - name: Unpack build kit
         run: |
-          mkdir -p www scripts
-          cat > package.json <<'PKG_EOF'
-          {"name":"markaz-tahfeez-apk","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"^6.2.0","@capacitor/app":"^6.0.0","@capacitor/browser":"^6.0.0","@capacitor/cli":"^6.2.0","@capacitor/core":"^6.2.0","@capacitor/filesystem":"^6.0.0","@capacitor/local-notifications":"^6.1.0","@capacitor/share":"^6.0.0"},"devDependencies":{"@capacitor/assets":"^3.0.5"}}
-          PKG_EOF
-          cat > www/index.html <<'HTML_EOF'
-          <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مركز التحفيظ</title></head><body style="font-family:sans-serif;text-align:center;padding:48px 20px;background:#0f3d3e;color:#f5ecd2"><h2>مركز التحفيظ</h2><p>تعذر الاتصال بالخادم. تحقق من الإنترنت ثم أعد فتح التطبيق.</p></body></html>
-          HTML_EOF
-          cat > scripts/prepare.js <<'JS_EOF'
-          const fs = require('fs');
-          const E = process.env, step = process.argv[2];
-          const siteUrl = (E.SITE_URL || '').trim().replace(/\/$/, '');
-          if (step === 'config') {
-            if (!/^https:\/\/[^\s]+\.[^\s]+$/.test(siteUrl)) { console.error('siteUrl غير صحيح. مثال: https://name.netlify.app'); process.exit(1); }
-            fs.writeFileSync('capacitor.config.json', JSON.stringify({
-              appId: 'ly.markaz.tahfeez', appName: 'مركز التحفيظ', webDir: 'www', backgroundColor: '#11503f',
-              server: { url: siteUrl, cleartext: false }, android: { allowMixedContent: false, backgroundColor: '#11503f' },
-              plugins: { LocalNotifications: { smallIcon: 'ic_stat_notify', iconColor: '#11503f' } }
-            }, null, 2));
-          }
-          if (step === 'android') {
-            const man = 'android/app/src/main/AndroidManifest.xml';
-            let m = fs.readFileSync(man, 'utf8');
-            ['POST_NOTIFICATIONS', 'SCHEDULE_EXACT_ALARM', 'USE_EXACT_ALARM', 'RECEIVE_BOOT_COMPLETED', 'VIBRATE'].forEach(p => {
-              if (!m.includes('android.permission.' + p)) m = m.replace('</manifest>', '    <uses-permission android:name="android.permission.' + p + '" />\n</manifest>');
-            });
-            fs.writeFileSync(man, m);
-            const gr = 'android/app/build.gradle';
-            let g = fs.readFileSync(gr, 'utf8');
-            g = g.replace(/versionCode\s+\d+/, 'versionCode ' + parseInt(E.VERSION_CODE, 10)).replace(/versionName\s+"[^"]*"/, 'versionName "' + E.VERSION_NAME + '"');
-            fs.writeFileSync(gr, g);
-            fs.mkdirSync('android/app/src/main/res/drawable', { recursive: true });
-            fs.writeFileSync('android/app/src/main/res/drawable/ic_stat_icon.xml',
-              '<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"><path android:fillColor="#FFFFFFFF" android:pathData="M12,22c1.1,0 2,-0.9 2,-2h-4c0,1.1 0.9,2 2,2zM18,16v-5c0,-3.07 -1.63,-5.64 -4.5,-6.32V4c0,-0.83 -0.67,-1.5 -1.5,-1.5s-1.5,0.67 -1.5,1.5v0.68C7.64,5.36 6,7.92 6,11v5l-2,2v1h16v-1l-2,-2z"/></vector>');
-            fs.writeFileSync('android/app/src/main/res/drawable/ic_stat_notify.png', Buffer.from('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', 'base64'));
-            const sty = 'android/app/src/main/res/values/styles.xml';
-            if (fs.existsSync(sty)) {
-              let t = fs.readFileSync(sty, 'utf8');
-              t = t.replace(/(<style name="AppTheme\.NoActionBar"[^>]*>)/, '$1\n        <item name="android:navigationBarColor">#f6f3ec</item>\n        <item name="android:windowLightNavigationBar">true</item>\n        <item name="android:windowBackground">@color/hifz_splash</item>');
-              fs.writeFileSync(sty, t);
-            }
-            fs.mkdirSync('android/app/src/main/res/values-night', { recursive: true });
-            fs.writeFileSync('android/app/src/main/res/values-night/styles.xml', '<?xml version="1.0" encoding="utf-8"?><resources><style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar"><item name="windowActionBar">false</item><item name="windowNoTitle">true</item><item name="android:background">@null</item><item name="android:navigationBarColor">#0e1512</item><item name="android:windowBackground">@color/hifz_splash</item></style></resources>');
-            const lst = 'android/app/src/main/res/values/styles.xml';
-            if (fs.existsSync(lst)) {
-              let u = fs.readFileSync(lst, 'utf8');
-              u = u.replace(/@drawable\/splash/g, '@color/hifz_splash');
-              const hasSS = u.includes('Theme.SplashScreen');
-              u = u.replace(/(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)/, '$1\n        <item name="android:navigationBarColor">#11503f</item>' + (hasSS ? '\n        <item name="windowSplashScreenBackground">@color/hifz_splash</item>' : ''));
-              fs.writeFileSync(lst, u);
-            }
-            fs.writeFileSync('android/app/src/main/res/values/hifz_colors.xml', '<?xml version="1.0" encoding="utf-8"?><resources><color name="hifz_splash">#11503f</color></resources>');
-            const mdir = 'android/app/src/main/java/ly/markaz/tahfeez';
-            if (fs.existsSync(mdir)) {
-              fs.writeFileSync(mdir + '/MainActivity.java', [
-                'package ly.markaz.tahfeez;',
-                'import android.graphics.Color;',
-                'import android.os.Bundle;',
-                'import android.view.View;',
-                'import com.getcapacitor.BridgeActivity;',
-                'public class MainActivity extends BridgeActivity {',
-                '  private void applyNav(String hex, boolean light) {',
-                '    try {',
-                '      getWindow().setNavigationBarColor(Color.parseColor(hex));',
-                '      View d = getWindow().getDecorView();',
-                '      int f = d.getSystemUiVisibility();',
-                '      d.setSystemUiVisibility(light ? (f | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) : (f & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));',
-                '    } catch (Exception e) {}',
-                '  }',
-                '  @Override',
-                '  public void onCreate(Bundle savedInstanceState) {',
-                '    super.onCreate(savedInstanceState);',
-                '    applyNav("#f6f3ec", true);',
-                '    try { getBridge().getWebView().setBackgroundColor(Color.parseColor("#11503f")); } catch (Exception e) {}',
-                '    try {',
-                '      getBridge().getWebView().addJavascriptInterface(new Object() {',
-                '        @android.webkit.JavascriptInterface',
-                '        public void setNav(final String hex, final boolean light) {',
-                '          runOnUiThread(new Runnable() { public void run() { applyNav(hex, light); } });',
-                '        }',
-                '      }, "HifzNative");',
-                '    } catch (Exception e) {}',
-                '  }',
-                '}'
-              ].join('\n'));
-            }
-          }
-          JS_EOF
-          cat > make_icons.py <<'PY_EOF'
-          from PIL import Image, ImageDraw, ImageChops
-          import os
-          os.makedirs('assets', exist_ok=True)
-          S = 1024
-          def glyph(size, pad):
-              im = Image.new('RGBA', (size, size), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-              sc = (size - 2 * pad) / 1024.0
-              P = lambda x, y: (pad + x * sc, pad + y * sc)
-              cx, cy, r = 512, 330, 170
-              a = Image.new('L', (size, size), 0); ImageDraw.Draw(a).ellipse([P(cx - r, cy - r), P(cx + r, cy + r)], fill=255)
-              b = Image.new('L', (size, size), 0); ImageDraw.Draw(b).ellipse([P(cx - r + 75, cy - r - 25), P(cx + r + 75, cy + r - 25)], fill=255)
-              im.paste(Image.new('RGBA', (size, size), (212, 175, 55, 255)), (0, 0), ImageChops.subtract(a, b))
-              cream = (245, 236, 210, 255)
-              d.polygon([P(512, 600), P(512, 820), P(250, 770), P(250, 560)], fill=cream)
-              d.polygon([P(512, 600), P(512, 820), P(774, 770), P(774, 560)], fill=cream)
-              d.line([P(512, 600), P(512, 820)], fill=(15, 61, 62, 255), width=max(2, int(10 * sc)))
-              for k in range(3):
-                  y0 = 630 + k * 40
-                  d.line([P(290, y0 - 8 + k * 6), P(480, y0 + 22 + k * 6)], fill=(15, 61, 62, 160), width=max(1, int(6 * sc)))
-                  d.line([P(734, y0 - 8 + k * 6), P(544, y0 + 22 + k * 6)], fill=(15, 61, 62, 160), width=max(1, int(6 * sc)))
-              return im
-          bg = (15, 61, 62, 255)
-          full = Image.new('RGBA', (S, S), bg); full.alpha_composite(glyph(S, 60)); full.save('assets/icon-only.png')
-          Image.new('RGBA', (S, S), bg).save('assets/icon-background.png')
-          glyph(S, 200).save('assets/icon-foreground.png')
-          os.makedirs('android/app/src/main/res/drawable', exist_ok=True)
-          full.resize((192, 192), Image.LANCZOS).save('android/app/src/main/res/drawable/ic_large_notify.png')
-          PY_EOF
-          echo "$KS_B64" | base64 -d > release.keystore
+          base64 -d <<'KIT_EOF' | tar xz || { echo "::error::ملف الـ workflow ناقص أو مقطوع عند النسخ. ارفعه كملف وليس لصقاً."; exit 1; }
+          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
+          Km70OQBQAAA=
+          KIT_EOF
+          ls kit
+
+      - name: Create project files
+        run: bash kit/create.sh
 
       - name: Install dependencies
         run: npm install
@@ -174,54 +158,38 @@ jobs:
         run: node scripts/prepare.js android
 
       - name: Native edge-to-edge and logo splash
+        run: bash kit/native.sh
+
+      - name: Generate custom reminder sound
+        run: bash kit/sound.sh
+
+      - name: Generate icons
+        continue-on-error: true
         run: |
-          pip install pillow
-          R=android/app/src/main/res
-          mkdir -p $R/drawable-nodpi $R/drawable-v23 $R/drawable
-          python3 - <<'LOGO_EOF'
-          import os, urllib.request
-          from PIL import Image, ImageDraw, ImageChops
-          R = 'android/app/src/main/res'
-          site = os.environ['SITE_URL'].strip().rstrip('/')
-          try:
-              req = urllib.request.Request(site + '/icon-512.png', headers={'User-Agent': 'Mozilla/5.0'})
-              open('logo_src.png', 'wb').write(urllib.request.urlopen(req, timeout=30).read())
-              src = Image.open('logo_src.png').convert('RGBA')
-          except Exception as e:
-              print('icon download failed, using plain fallback:', e)
-              src = Image.new('RGBA', (512, 512), (17, 80, 63, 255))
-          L = 448
-          logo = src.resize((L, L), Image.LANCZOS)
-          mask = Image.new('L', (L, L), 0)
-          ImageDraw.Draw(mask).rounded_rectangle([0, 0, L - 1, L - 1], radius=int(L * 30 / 112), fill=255)
-          logo.putalpha(ImageChops.multiply(logo.getchannel('A'), mask))
-          logo.save(R + '/drawable-nodpi/hifz_logo.png')
-          C = 1152
-          canvas = Image.new('RGBA', (C, C), (0, 0, 0, 0))
-          canvas.paste(logo, ((C - L) // 2, (C - L) // 2), logo)
-          canvas.save(R + '/drawable-nodpi/hifz_splash_icon.png')
-          LOGO_EOF
-          cat > $R/drawable/hifz_window_bg.xml <<'XML_EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-              <item><shape android:shape="rectangle"><solid android:color="#11503f" /></shape></item>
-          </layer-list>
-          XML_EOF
-          cat > $R/drawable-v23/hifz_window_bg.xml <<'XML_EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-              <item><shape android:shape="rectangle"><solid android:color="#11503f" /></shape></item>
-              <item android:width="112dp" android:height="112dp" android:gravity="center">
-                  <bitmap android:src="@drawable/hifz_logo" android:gravity="fill" />
-              </item>
-          </layer-list>
-          XML_EOF
-          python3 - <<'STY_EOF'
-          import os, re
-          R = 'android/app/src/main/res'
-          for f in ['values/styles.xml', 'values-night/styles.xml']:
-              p = os.path.join(R, f)
-              if not os.path.exists(p): continue
-              t = open(p, encoding='utf-8').read()
-              t = t.replace('<item name="android:windowBackground">@color/hifz_splash</item>', '<item name="android:windowBackground">@drawable/hifz_window_bg</item>')
-              if 'Theme.Splash
+          python3 -m pip install --quiet pillow || python3 -m pip install --quiet --break-system-packages pillow || echo "pillow install failed, using fallback"
+          python3 make_icons.py
+          npx capacitor-assets generate --android --iconBackgroundColor '#0f3d3e' --iconBackgroundColorDark '#0f3d3e'
+
+      - name: Sync
+        run: npx cap sync android
+
+      - name: Build release APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Align and sign
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "Unsigned: $APK"
+          $BT/zipalign -p -f 4 "$APK" aligned.apk
+          $BT/apksigner sign --ks release.keystore --ks-pass pass:$KS_PASS --key-pass pass:$KS_PASS --ks-key-alias $KS_ALIAS --out markaz-tahfeez.apk aligned.apk
+          $BT/apksigner verify --print-certs markaz-tahfeez.apk | head -3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: markaz-tahfeez-apk
+          path: markaz-tahfeez.apk
+          
