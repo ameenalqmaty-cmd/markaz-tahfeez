@@ -6,12 +6,18 @@ on:
         description: "رابط موقعك على Cloudflare Pages (مثال https://name.pages.dev)"
         required: true
         type: string
+      versionName:
+        description: "للتجربة فقط: رقم إصدار يدوي (اتركه فارغاً ليؤخذ من version.json)"
+        required: false
+        default: ""
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-24.04
     env:
       SITE_URL: ${{ inputs.siteUrl }}
+      V_OVR: ${{ inputs.versionName }}
       PIP_BREAK_SYSTEM_PACKAGES: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       KS_PASS: "pSq5PXwPissRV9SNCwGm"
@@ -28,7 +34,8 @@ jobs:
       - name: Read version from site (APK = app version)
         run: |
           V="$(curl -fsSL "$SITE_URL/version.json?t=$(date +%s)" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(String(JSON.parse(s).version||""))}catch(e){}})')"
-          case "$V" in [0-9]*.[0-9]*.[0-9]*) ;; *) echo "::error::تعذر قراءة version من $SITE_URL/version.json - ارفع الموقع أولاً"; exit 1 ;; esac
+          [ -n "$V_OVR" ] && V="$V_OVR"
+          case "$V" in [0-9]*.[0-9]*.[0-9]*) ;; *) echo "::error::تعذر قراءة version من الموقع"; exit 1 ;; esac
           IFS=. read MA MI PA <<< "$V"
           CODE=$((MA*10000 + MI*100 + PA))
           echo "VERSION_NAME=$V" >> "$GITHUB_ENV"
