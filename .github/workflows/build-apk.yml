@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       siteUrl:
-        description: "رابط موقعك على Cloudflare Pages (مثال https://name.pages.dev)"
+        description: "رابط موقعك (https://name.pages.dev)"
         required: true
         type: string
       versionName:
-        description: "رقم إصدار يدوي للتجربة (اتركه فارغاً)"
+        description: "إصدار يدوي (اتركه فارغاً)"
         required: false
         default: ""
         type: string
@@ -34,11 +34,11 @@ jobs:
           case "$U" in http://*|https://*) ;; *) U="https://$U" ;; esac
           echo "SITE_URL=$U" >> "$GITHUB_ENV"
           echo "Site URL: $U"
-      - name: Read version from site (APK = app version)
+      - name: Read APK version (apk.versionName from version.json)
         run: |
-          V="$(curl -fsSL "$SITE_URL/version.json?t=$(date +%s)" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(String(JSON.parse(s).version||""))}catch(e){}})')"
+          V="$(curl -fsSL "$SITE_URL/version.json?t=$(date +%s)" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{let j=JSON.parse(s);console.log(String((j.apk&&j.apk.versionName)||j.version||""))}catch(e){}})')"
           [ -n "$V_OVR" ] && V="$V_OVR"
-          case "$V" in [0-9]*.[0-9]*.[0-9]*) ;; *) echo "::error::تعذر قراءة version من الموقع"; exit 1 ;; esac
+          case "$V" in [0-9]*.[0-9]*.[0-9]*) ;; *) echo "::error::تعذر قراءة الإصدار"; exit 1 ;; esac
           IFS=. read MA MI PA <<< "$V"
           CODE=$((MA*10000 + MI*100 + PA))
           echo "VERSION_NAME=$V" >> "$GITHUB_ENV"
@@ -81,7 +81,7 @@ jobs:
       - name: Patch Android project
         run: node scripts/prepare.js android
 
-      - name: Native edge-to-edge and logo splash
+      - name: Native edge-to-edge
         run: bash kit/native.sh
 
       - name: Generate custom reminder sound
@@ -117,7 +117,7 @@ jobs:
           name: markaz-tahfeez-apk
           path: markaz-tahfeez.apk
 
-      - name: Publish release (latest)
+      - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
